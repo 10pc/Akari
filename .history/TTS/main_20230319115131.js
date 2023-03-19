@@ -1,4 +1,4 @@
-const tmi = require('tmi.js');
+
 
 require('dotenv').config();
 
@@ -23,17 +23,4 @@ io.on('connection', (socket) => {
 });
 server.listen(port, () => {
   console.log(`listening on ${host}:${port}`);
-});
-
-const client = new tmi.Client({
-  options: { debug: true },
-  connection: { reconnect: true },
-  identity: {
-      username: twitch_username,
-      password: twitch_token
-  },
-  channels: twitch_channel
-});
-client.connect().catch((error) => {
-  console.error(error);
 });

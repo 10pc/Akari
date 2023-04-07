@@ -1,5 +1,3 @@
-import { spawn } from 'child_process';
-
 var
   messages = [],
   lastUserMessage = "",
@@ -10,11 +8,7 @@ function response() {
   // send lastUserMessage to gpt4all
   // send gpt4all response to translation
   // botMessage = translated text
-  console.log(lastUserMessage)
-  const sensor = spawn('python', [lastUserMessage, './translator.py']);
-  sensor.stdout.on('data', function(data) {
-    botMessage = parseFloat(data);
-});
+  // tts
 
 }
 

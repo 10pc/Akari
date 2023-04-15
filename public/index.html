@@ -5,10 +5,136 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./chat.css">
-  <script src="./chat.js"></script>
   <title>Chat</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.5/axios.min.js"
+    integrity="sha512-nnNHpffPSgINrsR8ZAIgFUIMexORL5tPwsfktOTxVYSv+AUAILuFYWES8IHl+hhIhpFGlKvWFiz9ZEusrPcSBQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
+
+<script>
+  var
+    messages = [],
+    lastUserMessage = "",
+    botMessage = "",
+    subtitle = "",
+    temp = ""
+
+  async function promptAI(message) {
+    axios.get(`http://localhost:3000/ai?text="${message}"`)
+      .then(async function (response) {
+        subtitle = await response.data;
+      })
+  }
+  async function writeSubtitle(message) {
+    axios.get(`http://localhost:3000/sub?text=${message}`)
+      .then(async function (response) {
+        console.log(message)
+      })
+  }
+  async function translate(message) {
+    axios.get(`http://localhost:3000/translate?text=${message}`)
+      .then(async function (response) {
+        botMessage = await response.data
+      })
+  }
+
+  async function entry() {
+    if (document.getElementById("chatbox").value != "") {
+      lastUserMessage = document.getElementById("chatbox").value;
+      document.getElementById("chatbox").value = "";
+      messages.push(lastUserMessage);
+
+      const resp = await fetch(`/ai?text="${lastUserMessage}`);
+      subtitle = await resp.json()
+
+      axios.get(`/sub?text=${subtitle.content}`)
+        .then(async function (response) {
+          console.log(subtitle.content)
+        })
+
+      const translated = await fetch(`/translate?text="${subtitle.content}`);
+      botMessage = await translated.json()
+
+      const tts = await fetch(`/tts?text=${botMessage.translatedText}`);
+      temp = await tts
+
+      for (var i = 1; i < 8; i++) {
+        if (messages[messages.length - i])
+          document.getElementById("chatlog" + i).innerHTML = messages[messages.length - i];
+      }
+      new Audio("./public/output.mp3").play()
+    }
+  }
+
+  document.onkeydown = key;
+  function key(e) {
+    var x = e || window.event;
+    var key = (x.keyCode || x.which);
+    if (key == 13 || key == 3) {
+      entry();
+    }
+  }
+</script>
+
+<style>
+  body {
+    font: 15px arial, sans-serif;
+    background-color: #d9d9d9;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    display: flex;
+    height: 93vh;
+  }
+
+  #bodybox {
+    margin: auto;
+    max-width: 550px;
+    font: 15px arial, sans-serif;
+    background-color: white;
+    border-style: solid;
+    border-width: 1px;
+    padding-top: 20px;
+    padding-bottom: 25px;
+    padding-right: 25px;
+    padding-left: 25px;
+    box-shadow: 5px 5px 5px grey;
+    border-radius: 15px;
+  }
+
+  #chatborder {
+    border-style: solid;
+    background-color: #f6f9f6;
+    border-width: 3px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 15px;
+    padding-right: 20px;
+    padding-left: 15px;
+    border-radius: 15px;
+  }
+
+  .chatlog {
+    font: 15px arial, sans-serif;
+  }
+
+  #chatbox {
+    font: 17px arial, sans-serif;
+    height: 22px;
+    width: 100%;
+  }
+
+  h1 {
+    margin: auto;
+  }
+
+  pre {
+    background-color: #f0f0f0;
+    margin-left: 20px;
+  }
+</style>
 
 <body>
   <div id='bodybox'>
@@ -22,18 +148,6 @@
       <p id="chatlog1" class="chatlog">&nbsp;</p>
       <input type="text" name="chat" id="chatbox">
     </div>
-    <br>
-    <p>To control what the chatbot will say make changes to the javascript function <b>chatbotResponse()</b> . You can also change the HTML or CSS. There is no need to keep these directions.</p>
-    <p>The variable <b>lastUserMessage</b> is a string that records the last thing typed.</p>
-    <p>The variable <b>botMessage</b> is a string that controls what the chatbot will say.</p>
-    <p>Example:</p>
-    <pre><code>if (lastUserMessage === 'hi'){
-    botMessage = 'Howdy!';
-  }</pre></code>
-    <pre><code>if (lastUserMessage === 'what is your name'){
-    botMessage = 'My name is' + botName;
-  }</pre></code>
-  
   </div>
 </body>
 

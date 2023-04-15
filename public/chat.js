@@ -9,6 +9,7 @@ function response() {
   // send gpt4all response to translation
   // botMessage = translated text
   // tts
+  
 
 }
 
@@ -18,7 +19,6 @@ function entry() {
     document.getElementById("chatbox").value = "";
     messages.push(lastUserMessage);
     response();
-    messages.push("<b>Akari:</b> " + botMessage);
     for (var i = 1; i < 8; i++) {
       if (messages[messages.length - i])
         document.getElementById("chatlog" + i).innerHTML = messages[messages.length - i];
